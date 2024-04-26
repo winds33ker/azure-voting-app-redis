@@ -1,0 +1,9 @@
+name: vote-app-ci-cd
+pool: Default
+trigger:
+  - main
+variables:
+  - template: variables/vars.yaml
+stages:
+  - template: stages/ci.yaml
+  - template: stages/cd.yaml

@@ -1,0 +1,23 @@
+# Azure DevOps pipeline variables
+variables:
+  # Azure DevOps pipeline environment
+  - name: environment
+    value: dev
+  - name: tag
+    value: $(Build.BuildId)
+  - name: imageName
+    value: "vote-app"
+  - name: dockerfilePath
+    value: "azure-vote/Dockerfile"
+  - name: registry
+    value: "demoVoteApp"
+  - name: currentDate
+    value: "$[ format('{0:yyyy}{0:MM}{0:dd}', pipeline.startTime) ]"
+  - name: manifestFile
+    value: "azure-vote-all-in-one-redis.yaml"
+  - name: k8sNamespace
+    value: "app"
+  - name: registrySecret
+    value: "pullSecret"
+  - name: aksServiceConnection
+    value: "Azure-DevOps-Service-Connection"

@@ -1,0 +1,26 @@
+stages:
+  - stage: ci
+    jobs:
+      - job: build
+        steps:
+          - task: Docker@2
+            inputs:
+              repository: $(imageName)
+              command: "buildAndPush"
+              Dockerfile: "$(dockerfilePath)"
+              containerRegistry: "$(registry)"
+              tags: |
+                $(tag)
+          - bash: |
+              echo "##vso[task.setvariable variable=appArtifact]voteapp_$(tag)_$(currentDate)"
+          - task: CopyFiles@2
+            inputs:
+              SourceFolder: "$(Build.SourcesDirectory)"
+              Contents: "**/$(manifestFile)"
+              TargetFolder: "$(Build.ArtifactStagingDirectory)"
+          - script: |
+              mv $(Build.ArtifactStagingDirectory)/$(manifestFile) $(Build.ArtifactStagingDirectory)/$(appArtifact).yaml
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: "$(Build.ArtifactStagingDirectory)"
+              ArtifactName: "drop"

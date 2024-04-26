@@ -1,0 +1,32 @@
+stages:
+  - stage: cd
+    jobs:
+      - job: get_manifest
+        steps:
+          - task: DownloadBuildArtifacts@1
+            inputs:
+              buildType: "current"
+              downloadType: "single"
+              artifactName: "drop"
+              downloadPath: "$(System.ArtifactsDirectory)"
+          - task: kubernetesManifest@1
+            displayName: creat secret
+            inputs:
+              action: createSecret
+              secretType: dockerRegistry
+              secretName: $(registrySecret)
+              dockerRegistryEndpoint: "$(registry)"
+              kubernetesServiceConnection: "$(aksServiceConnection)"
+              namespace: "$(k8sNamespace)"
+          - task: kubernetesManifest@1
+            displayName: deploy vote app
+            inputs:
+              action: "deploy"
+              kubernetesServiceConnection: "$(aksServiceConnection)"
+              namespace: "$(k8sNamespace)"
+              manifests: |
+                $(System.ArtifactsDirectory)/drop/$(appArtifact).yaml
+              containers: |
+                $(registry)/$(imageName):$(tag)
+              imagePullSecrets: |
+                $(registrySecret)
